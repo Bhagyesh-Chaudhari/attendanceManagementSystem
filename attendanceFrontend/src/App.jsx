@@ -1,29 +1,40 @@
-
+"use client"
 
 import { useState } from "react"
-import Login from "./components/login"
-import SubjectPanel from "./components/SubjectPanel"
-import AttendanceForm from "./components/AttendanceForm"
-import { ThemeProvider } from "./components/theme-provider"
-import "./app/globals.css"
+import { Login } from "./pages/login"
+import { SubjectPanel } from "./pages/subject-panel"
+import { AttendanceForm } from "./pages/attendance-form"
+import { Toaster } from "@/components/ui/toaster"
+import { AuthProvider } from "./context/auth-context"
 
 function App() {
   const [token, setToken] = useState("")
   const [teacher, setTeacher] = useState(null)
   const [selected, setSelected] = useState(null)
 
+  const handleLogout = () => {
+    setToken("")
+    setTeacher(null)
+    setSelected(null)
+  }
+
+  const handleBack = () => {
+    setSelected(null)
+  }
+
   return (
-    <ThemeProvider defaultTheme="light" storageKey="attendance-theme">
-      <div className="min-h-screen bg-slate-50">
+    <AuthProvider value={{ token, teacher, setToken, setTeacher, handleLogout }}>
+      <div className="min-h-screen bg-background">
         {!token ? (
-          <Login setTeacher={setTeacher} setToken={setToken} />
+          <Login />
         ) : !selected ? (
-          <SubjectPanel token={token} setSelected={setSelected} />
+          <SubjectPanel setSelected={setSelected} />
         ) : (
-          <AttendanceForm token={token} selected={selected} />
+          <AttendanceForm selected={selected} onBack={handleBack} />
         )}
+        <Toaster />
       </div>
-    </ThemeProvider>
+    </AuthProvider>
   )
 }
 
