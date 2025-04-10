@@ -13,7 +13,7 @@ app.use(express.json());
 app.post('/teacher/login', teacherController.login);
 app.get('/teacher/subjects', auth, teacherController.getSubjects);
 app.post('/teacher/attendance', auth, teacherController.submitAttendance);
-router.get('/students', auth, teacherController.getStudents);
+app.get('/teacher/students', auth, teacherController.getStudents);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
