@@ -14,6 +14,8 @@ app.post('/teacher/login', teacherController.login);
 app.get('/teacher/subjects', auth, teacherController.getSubjects);
 app.post('/teacher/attendance', auth, teacherController.submitAttendance);
 app.get('/teacher/students', auth, teacherController.getStudents);
+app.post('/teacher/signup', teacherController.signup);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -38,11 +38,11 @@ exports.getSubjects = (req, res) => {
 
 exports.submitAttendance = (req, res) => {
   const teacherId = req.user.id;
-  const { classId, subjectId, attendanceList, date } = req.body;
+  const { class_id, subjectId, attendanceList, date } = req.body;
 
   const values = attendanceList.map((entry) => [
     teacherId,
-    classId,
+    class_id,
     subjectId,
     entry.student_name,
     entry.status,
@@ -60,10 +60,42 @@ exports.submitAttendance = (req, res) => {
 };
 
 exports.getStudents = (req, res) => {
-    const { classId } = req.query;
+    const { class_id } = req.query;
   
-    db.query('SELECT name FROM students WHERE class_id = ?', [classId], (err, results) => {
+    db.query('SELECT * FROM students WHERE class_id = ?', [class_id], (err, results) => {
       if (err) return res.status(500).json({ error: err });
       res.json(results);
     });
   };
+
+  exports.signup = async (req, res) => {
+    const { name, email, password } = req.body;
+  
+    try {
+      // Check if email already exists
+      db.query('SELECT * FROM teachers WHERE email = ?', [email], async (err, results) => {
+        if (err) return res.status(500).json({ error: err });
+  
+        if (results.length > 0) {
+          return res.status(409).json({ message: 'Email already registered' });
+        }
+  
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+  
+        // Insert new teacher
+        db.query(
+          'INSERT INTO teachers (name, email, password) VALUES (?, ?, ?)',
+          [name, email, hashedPassword],
+          (err, result) => {
+            if (err) return res.status(500).json({ error: err });
+  
+            res.status(201).json({ message: 'Teacher registered successfully', id: result.insertId });
+          }
+        );
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Something went wrong' });
+    }
+  };
+  

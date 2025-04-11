@@ -1,0 +1,62 @@
+.subject-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+  }
+  
+  .subject-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .subject-header h2 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+  }
+  
+  .subject-header p {
+    color: #555;
+  }
+  
+  .loading,
+  .error-message,
+  .no-subjects {
+    text-align: center;
+    color: #888;
+    margin-top: 30px;
+    font-size: 16px;
+  }
+  
+  .subject-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+  }
+  
+  .subject-card {
+    background-color: #f0f4f8;
+    border: 1px solid #dcdcdc;
+    padding: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+  
+  .subject-card:hover {
+    background-color: #dff0ff;
+    border-color: #3498db;
+  }
+  
+  .subject-card h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #34495e;
+  }
+  
+  .subject-card p {
+    margin: 8px 0 0;
+    color: #555;
+  }
+  
