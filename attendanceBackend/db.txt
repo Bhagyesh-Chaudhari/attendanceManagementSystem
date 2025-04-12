@@ -1,0 +1,102 @@
+CREATE DATABASE attendance_system;
+USE attendance_system;
+CREATE TABLE teachers (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100),
+  email VARCHAR(100) UNIQUE,
+  password VARCHAR(255),
+  role ENUM('admin', 'teacher') DEFAULT 'teacher'
+);
+ALTER TABLE teachers ADD COLUMN role ENUM('admin', 'teacher') DEFAULT 'teacher';
+
+CREATE TABLE classes (	
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50)
+);
+
+CREATE TABLE students (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100),
+  class_id INT,
+  FOREIGN KEY (class_id) REFERENCES classes(id)
+);
+
+CREATE TABLE subjects (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100),
+  class_id INT,
+  FOREIGN KEY (class_id) REFERENCES classes(id)
+);
+
+
+CREATE TABLE teacher_subject (
+  teacher_id INT,
+  subject_id INT,
+  PRIMARY KEY (teacher_id, subject_id),
+  FOREIGN KEY (teacher_id) REFERENCES teachers(id),
+  FOREIGN KEY (subject_id) REFERENCES subjects(id)
+);
+
+
+CREATE TABLE attendance (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  teacher_id INT,
+  class_id INT,
+  subject_id INT,
+  student_name VARCHAR(100),
+  status ENUM('present', 'absent'),
+  date DATE,
+  FOREIGN KEY (teacher_id) REFERENCES teachers(id),
+  FOREIGN KEY (class_id) REFERENCES classes(id),
+  FOREIGN KEY (subject_id) REFERENCES subjects(id)
+);
+
+INSERT INTO teachers (name, email, password, role) 
+VALUES ('Admin', 'admin@school.com', '$2b$10$Go6zVsn2zzL.feu91XUY3uCo.q.EnkcBTxRDIDgwUwfpi733YMl9.', 'admin');
+
+INSERT INTO classes (name) VALUES ('EXCS SE A'), ('EXCS SE B');
+INSERT INTO classes (name) VALUES ('EXCS FE A'), ('EXCS FE B'), ('EXCS FE C');
+
+-- Web Technology for EXCS SE A (class_id = 1)
+-- DBMS and Python for EXCS SE A (class_id = 1)
+-- Python for EXCS SE B (class_id = 2)
+INSERT INTO subjects (name, class_id) VALUES
+('Web Technology', 1),
+('DBMS', 1),
+('Python', 1),
+('Python', 2);
+
+INSERT INTO teacher_subject (teacher_id, subject_id) VALUES
+-- nvchettiar (id = 1)
+(1, 1),  -- WT EXCS SE A
+(1, 4),  -- Python EXCS SE B
+
+-- Bhagyesh (id = 2)
+(2, 2),  -- DBMS EXCS SE A
+(2, 3);  -- Python EXCS SE A
+
+INSERT INTO students (name, class_id) VALUES 
+('Rohan Sharma', 1),
+('Sneha Patil', 1),
+('Amit Desai', 2),
+('Priya Kulkarni', 2);
+
+
+
+select * from teachers;
+select * from subjects;
+select * from classes;
+select * from attendance;
+select * from teacher_subject;
+select * from students;
+
+
+
+ALTER TABLE teachers DROP COLUMN password;
+ALTER TABLE teachers ADD COLUMN password VARCHAR(255);
+
+
+TRUNCATE TABLE classes;
+DROP DATABASE attendance_system;
+
+SELECT * FROM students WHERE class_id = 1;

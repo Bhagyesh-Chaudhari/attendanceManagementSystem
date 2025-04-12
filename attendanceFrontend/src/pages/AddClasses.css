@@ -1,0 +1,83 @@
+.add-class-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    font-family: "Segoe UI", sans-serif;
+    border-radius: 25px;
+  }
+  
+  .add-class-form {
+    background-color: white;
+    padding: 2rem 3rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .add-class-form h2 {
+    margin-bottom: 1.5rem;
+    color: #333;
+  }
+  
+  .add-class-form select {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s;
+  }
+  
+  .add-class-form select:focus {
+    border-color: #2196f3;
+    outline: none;
+  }
+  
+  .addClassButton {
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    padding: 12px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .addClassButton:hover {
+    background-color: #45a049;
+  }
+  
+  .back-btn {
+    margin-top: 1rem;
+    width: 100%;
+    padding: 12px;
+    background-color: #ccc;
+    color: #333;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .back-btn:hover {
+    background-color: #bbb;
+  }
+  
+  .message {
+    margin-top: 1rem;
+    color: #333;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  
