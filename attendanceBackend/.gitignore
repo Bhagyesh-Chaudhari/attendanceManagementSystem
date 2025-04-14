@@ -28,5 +28,4 @@ build/
 .vscode/
 
 # Database dumps
-*.sql
 *.sqlite

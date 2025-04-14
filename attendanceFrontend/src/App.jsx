@@ -6,6 +6,8 @@ import AttendanceForm from './pages/AttendanceForm';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AddClasses from './pages/AddClasses';
+import AddSubjects from './pages/AddSubjects';
+import AddBranchYearSubject from './pages/AddBranchYearSubject';
 
 
 function App() {
@@ -18,6 +20,8 @@ function App() {
         <Route path="/change-password/:id" element={<ChangePasswordPage />} />
         <Route path="/admin-dashboard" element={<AdminDashboard/>} />
         <Route path="/add-class" element={<AddClasses />} />
+        <Route path="/add-subject" element={<AddSubjects />} />
+        <Route path="/add-subject-branch" element={<AddBranchYearSubject />} /> 
       </Routes>
     </Router>
   );

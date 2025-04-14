@@ -1,18 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./AddClasses.css";
 import { useNavigate } from "react-router-dom";
 
 const AddClasses = () => {
+  const [branches, setBranches] = useState([]);
+  const [years, setYears] = useState([]);
   const [branch, setBranch] = useState("");
   const [year, setYear] = useState("");
   const [division, setDivision] = useState("");
   const [message, setMessage] = useState("");
 
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+  // Fetch branches and years when the component mounts
+  useEffect(() => {
+    const fetchBranchesAndYears = async () => {
+
+      try {
+        const res = await fetch("http://localhost:5000/admin/getBranchesAndYears", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          // Assuming the response contains both branches and years
+          setBranches(data.branches);
+          setYears(data.years);
+        } else {
+          setMessage(data.message || "Error fetching data.");
+        }
+      } catch (error) {
+        console.error(error);
+        setMessage("Server error.");
+      }
+    };
+
+    fetchBranchesAndYears();
+  }, []);
 
   const handleAddClass = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
 
     const className = `${branch} ${year} ${division}`;
 
@@ -49,20 +81,20 @@ const AddClasses = () => {
 
         <select value={branch} onChange={(e) => setBranch(e.target.value)} required>
           <option value="">Select Branch</option>
-          <option value="CMPN">CMPN</option>
-          <option value="INFT">INFT</option>
-          <option value="EXCS">EXCS</option>
-          <option value="EXTC">EXTC</option>
-          <option value="BIOMED">BIOMED</option>
-          <option value="VIIE">VIIE</option>
+          {branches.map((b) => (
+            <option key={b.branch_id} value={b.branch_name}>
+              {b.branch_name}
+            </option>
+          ))}
         </select>
 
         <select value={year} onChange={(e) => setYear(e.target.value)} required>
           <option value="">Select Year</option>
-          <option value="F.E.">F.E.</option>
-          <option value="S.E.">S.E.</option>
-          <option value="T.E.">T.E.</option>
-          <option value="B.Tech">B.Tech</option>
+          {years.map((y) => (
+            <option key={y.year_id} value={y.year_name}>
+              {y.year_name}
+            </option>
+          ))}
         </select>
 
         <select value={division} onChange={(e) => setDivision(e.target.value)} required>

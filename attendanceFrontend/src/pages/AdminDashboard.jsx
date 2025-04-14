@@ -22,12 +22,15 @@ const AdminDashboard = () => {
         <div className="admin-card" onClick={() => navigate("/add-subject")}>
           Add Subjects
         </div>
+        <div className="admin-card" onClick={() => navigate("/add-subject-branch")}>
+          Add Subjects To Branches
+        </div>
         <div className="admin-card" onClick={() => navigate("/assign-teacher")}>
           Assign Teachers
         </div>
-        <div className="admin-card" onClick={() => navigate("/manage-data")}>
+        {/* <div className="admin-card" onClick={() => navigate("/manage-data")}>
           Manage Data
-        </div>
+        </div> */}
         <button onClick={handleLogout}>Logout</button>
       </div>
     </div>

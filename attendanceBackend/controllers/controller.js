@@ -230,24 +230,40 @@ If the class is added successfully, it returns a 201 status code with a success 
 exports.addClass = (req, res) => {
   const { className } = req.body;
 
-  if (!className)
+  if (!className) {
     return res.status(400).json({ message: "Class name is required" });
+  }
 
+  // Check if the class already exists
   db.query(
-    "INSERT INTO classes (name) VALUES (?)",
+    "SELECT * FROM classes WHERE name = ?",
     [className],
-    (err, result) => {
-      if (err)
-        return res
-          .status(500)
-          .json({ message: "Error adding class", error: err });
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ message: "Server error", error: err });
+      }
 
-      res
-        .status(201)
-        .json({
-          message: "Class added successfully",
-          classId: result.insertId,
-        });
+      if (results.length > 0) {
+        return res.status(409).json({ message: "Class already exists" });
+      }
+
+      // If not exists, insert the class
+      db.query(
+        "INSERT INTO classes (name) VALUES (?)",
+        [className],
+        (insertErr, insertResult) => {
+          if (insertErr) {
+            return res
+              .status(500)
+              .json({ message: "Error adding class", error: insertErr });
+          }
+
+          return res.status(201).json({
+            message: "Class added successfully",
+            classId: insertResult.insertId,
+          });
+        }
+      );
     }
   );
 };
@@ -268,4 +284,135 @@ exports.getAllClasses = (req, res) => {
 
     res.json(results);
   });
+};
+
+/*
+This function is to fetch the branches and years from the database
+It queries the database to get all branches and years and returns them in JSON format
+*/
+
+exports.getBranchesAndYears = (req, res) => {
+  const branchesQuery = `SELECT id AS branch_id, code AS branch_name FROM branches`;
+  const yearsQuery = `SELECT id AS year_id, name AS year_name FROM years`;
+
+  db.query(branchesQuery, (err, branchResults) => {
+    if (err)
+      return res
+        .status(500)
+        .json({ error: "Error fetching branches", details: err });
+
+    db.query(yearsQuery, (err, yearResults) => {
+      if (err)
+        return res
+          .status(500)
+          .json({ error: "Error fetching years", details: err });
+
+      res.json({
+        branches: branchResults,
+        years: yearResults,
+      });
+    });
+  });
+};
+
+// This function is to add a subject in db it will take subject name and subject code
+//it will check if the subject already exists in the database
+
+exports.addSubject = (req, res) => {
+  const { subjectName, subjectCode } = req.body;
+
+  if (!subjectName || !subjectCode) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  //check if the subject already exists in the database
+  db.query(
+    "SELECT * FROM subjects WHERE name = ?",
+    [subjectName],
+    (err, results) => {
+      if (err) return res.status(500).json({ error: err });
+
+      if (results.length > 0) {
+        return res.status(409).json({ message: "Subject already exists" });
+      }
+
+      // If not exists, insert the subject
+      db.query(
+        "INSERT INTO subjects (name, subject_code) VALUES (?, ?)",
+        [subjectName, subjectCode],
+        (insertErr, insertResult) => {
+          if (insertErr) {
+            return res
+              .status(500)
+              .json({ message: "Error adding subject", error: insertErr });
+          }
+
+          return res.status(201).json({
+            message: "Subject added successfully",
+            subjectId: insertResult.insertId,
+          });
+        }
+      );
+    }
+  );
+};
+
+exports.getAllSubjects = (req, res) => {
+  db.query("SELECT * FROM subjects", (err, results) => {
+    if (err)
+      return res
+        .status(500)
+        .json({ message: "Error fetching subjects", error: err });
+
+    res.json(results);
+  });
+};
+
+//This endpoint is to add subject to the specific year and branch
+//check if subject already assigned to the branch and year
+
+exports.addBranchYearSubject = (req, res) => {
+  const { subjectName, branchId, yearId } = req.body;
+
+  if (!subjectName || !branchId || !yearId) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  //check if the subject already exists in the branch_year_subjects database in that all id are stored of branch year and subject
+  db.query(
+    "SELECT * FROM branch_year_subjects WHERE branch_id = ? AND year_id = ? AND subject_id = (SELECT id FROM subjects WHERE name = ?)",
+    [branchId, yearId, subjectName],
+    (err, results) => {
+      if (err) return res.status(500).json({ error: err });
+
+      if (results.length > 0) {
+        return res
+          .status(409)
+          .json({
+            message: "Subject already assigned to this branch and year",
+          });
+      }
+
+      // If not exists, insert the subject
+      db.query(
+        "INSERT INTO branch_year_subjects (subject_id, branch_id, year_id) VALUES (?, ?, (SELECT id FROM subjects WHERE name = ?))",
+        [branchId, yearId, subjectName],
+        (insertErr, insertResult) => {
+          if (insertErr) {
+            return res
+              .status(500)
+              .json({
+                message: "Error adding subject to branch and year",
+                error: insertErr,
+              });
+          }
+
+          return res.status(201).json({
+            message: "Subject assigned to branch and year successfully",
+            subjectId: insertResult.insertId,
+          });
+        }
+      );
+    }
+  );
 };

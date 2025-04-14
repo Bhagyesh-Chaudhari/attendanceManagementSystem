@@ -42,6 +42,10 @@ app.post('/teacher/updatePassword', auth, controller.updatePassword);
 app.post('/admin/createTeacher', auth, controller.createTeacher);
 app.post('/admin/addClass', auth, controller.addClass);
 app.get('/admin/getAllClasses', auth, controller.getAllClasses);
+app.get('/admin/getBranchesAndYears', auth, controller.getBranchesAndYears);
+app.post('/admin/addSubject', auth, controller.addSubject);
+app.get('/admin/getAllSubjects', auth, controller.getAllSubjects);
+app.post('/admin/addBranchYearSubject', auth, controller.addBranchYearSubject);
 
 
 

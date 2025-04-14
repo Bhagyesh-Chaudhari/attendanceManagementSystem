@@ -11,13 +11,42 @@
 
 .admin-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 2rem;
 }
 
 .admin-header h1 {
   color: #333;
+}
+
+.admin-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  max-width: 900px;
+}
+
+.admin-card {
+  background: white;
+  padding: 1.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-weight: bold;
+  color: #555;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  min-width: 200px;
+  flex: 1 1 200px;
+}
+
+.admin-card:hover {
+  transform: translateY(-4px);
+  background-color: #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .admin-content button {
@@ -28,37 +57,5 @@
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
-}
-
-.admin-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1.5rem;
-}
-
-.admin-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  font-weight: bold;
-  color: #555;
-  transition: transform 0.2s ease;
-  cursor: pointer;
-}
-
-.admin-card:hover {
-  transform: translateY(-5px);
-  background-color: #f0f0f0;
-}
-
-.admin-card {
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.admin-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  margin-top: 2rem;
 }
