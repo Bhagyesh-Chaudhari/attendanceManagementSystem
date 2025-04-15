@@ -76,18 +76,25 @@ It returns the subjects and classes in JSON format
 exports.getSubjects = (req, res) => {
   const teacherId = req.user.id;
 
-  db.query(
-    `SELECT s.id as subject_id, s.name as subject_name, c.id as class_id, c.name as class_name 
-      FROM subjects s
-      JOIN classes c ON s.class_id = c.id
-      WHERE s.id IN (SELECT subject_id FROM teacher_subject WHERE teacher_id = ?)`,
-    [teacherId],
-    (err, results) => {
-      if (err) return res.status(500).json({ error: err });
-      res.json(results);
-    }
-  );
+  const query = `
+    SELECT 
+      s.id AS subject_id,
+      s.name AS subject_name,
+      c.id AS class_id,
+      c.name AS class_name
+    FROM teacher_subject ts
+    JOIN branch_year_subjects bys ON ts.branch_year_subject_id = bys.id
+    JOIN subjects s ON bys.subject_id = s.id
+    JOIN classes c ON ts.class_id = c.id
+    WHERE ts.teacher_id = ?
+  `;
+
+  db.query(query, [teacherId], (err, results) => {
+    if (err) return res.status(500).json({ error: "Database error", details: err });
+    res.json(results);
+  });
 };
+
 
 /*
 This function is used to submit attendance for a specific class and subject

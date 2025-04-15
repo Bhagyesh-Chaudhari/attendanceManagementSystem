@@ -49,6 +49,7 @@ CREATE TABLE classes (
 
 CREATE TABLE students (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  roll_no VARCHAR(20) UNIQUE,
   name VARCHAR(100),
   class_id INT,
   FOREIGN KEY (class_id) REFERENCES classes(id)
@@ -72,6 +73,7 @@ CREATE TABLE teacher_subject (
   FOREIGN KEY (class_id) REFERENCES classes(id)
 );
 
+-- DROP TABLE IF EXISTS students;
 -- DROP TABLE IF EXISTS teacher_subject;
 -- ALTER TABLE teacher_subject
 -- DROP FOREIGN KEY teacher_subject_ibfk_2;
@@ -116,3 +118,26 @@ ALTER TABLE subjects ADD COLUMN subject_code VARCHAR(20) UNIQUE;
 
 SELECT * FROM students WHERE class_id = 1;
 SELECT * FROM classes WHERE name LIKE "CMPN S.E. A";
+
+
+SELECT b.id AS branch_year_subjects_id, s.id AS subject_id, s.name AS subject_name 
+     FROM branch_year_subjects b
+     JOIN subjects s ON b.subject_id = s.id
+     WHERE b.branch_id = 3 AND b.year_id = 2;
+     
+     
+INSERT INTO students (roll_no, name, class_id) VALUES
+('23108A0032', 'BHOI HEMANT SANJAY SUREKHABEN', 4),
+('23108A0043', 'UBARHANDE  ANURAG  NAJUKRAO  SEEMA', 4),
+('23108A0044', 'CHOUDHARI MOHD ANAS  SARVAR JAHAN', 4),
+('23108A0047', 'TATE ARYAN  JITENDRA SUVARNA', 4),
+('23108A0048', 'BIND SUBHANSU SUBHASHCHAND PRAMILA', 4),
+('23108B0008', 'THAKRE YASH RAJENDRA SHALINI', 5),
+('23108B0013', 'PENKAR SHUBHAM SAMEER SANJANA', 5),
+('23108B0015', 'ATTARDE TUSHAR SANDIP PUNAM', 5),
+('23108B0031', 'SWANI KABIR MOHIT RITU', 5),
+('23108B0049', 'ANDHALE SEJAL SAMPAT SARALA', 5),
+('23108B0055', 'PANDEY  NIKUNJ  SHOBHNATH SUSHMA', 5),
+('23108B0073', 'PATIL KSHITIJ MILIND VAISHALI', 5),
+('23108B0083', 'PATIL SIDDHESH SANJAY SARITA', 5),
+('24108A2014', 'RASHIDEE MOHAMMAD BILAL HARSHAD ISHRA', 4);

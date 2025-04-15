@@ -98,7 +98,7 @@ function AttendanceForm() {
 
   return (
     <div>
-      <button onClick={() => navigate("/subject-panel")}>← Back</button>
+      <button onClick={() => navigate("/teacher-dashboard")}>← Back</button>
       <h2>
         Attendance for {selected?.class_name} - {selected?.subject_name}
       </h2>
