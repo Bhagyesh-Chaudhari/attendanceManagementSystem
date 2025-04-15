@@ -9,15 +9,15 @@ select * from classes;
 select * from attendance;
 select * from teacher_subject;
 select * from students;
-select * from branch_year_subjects;
-
+select * from branch_year_subjects;	
 
 CREATE TABLE teachers (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100),
   email VARCHAR(100) UNIQUE,
   password VARCHAR(255),
-  role ENUM('admin', 'teacher') DEFAULT 'teacher'
+  role ENUM('admin', 'teacher') DEFAULT 'teacher',
+  is_temp_password BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE branches (
@@ -62,12 +62,24 @@ CREATE TABLE subjects (
 );
 
 CREATE TABLE teacher_subject (
+  id INT AUTO_INCREMENT PRIMARY KEY,
   teacher_id INT,
-  subject_id INT,
-  PRIMARY KEY (teacher_id, subject_id),
+  branch_year_subject_id INT,
+  class_id INT,
+  UNIQUE (teacher_id, branch_year_subject_id, class_id),
   FOREIGN KEY (teacher_id) REFERENCES teachers(id),
-  FOREIGN KEY (subject_id) REFERENCES subjects(id)
+  FOREIGN KEY (branch_year_subject_id) REFERENCES branch_year_subjects(id),
+  FOREIGN KEY (class_id) REFERENCES classes(id)
 );
+
+-- DROP TABLE IF EXISTS teacher_subject;
+-- ALTER TABLE teacher_subject
+-- DROP FOREIGN KEY teacher_subject_ibfk_2;
+-- ALTER TABLE teacher_subject
+-- CHANGE subject_id branch_year_subject_id INT;
+-- ALTER TABLE teacher_subject
+-- ADD CONSTRAINT fk_teacher_subject_branch_year_subject
+-- FOREIGN KEY (branch_year_subject_id) REFERENCES branch_year_subjects(id);
 
 CREATE TABLE attendance (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -103,3 +115,4 @@ ALTER TABLE subjects DROP COLUMN class_id;
 ALTER TABLE subjects ADD COLUMN subject_code VARCHAR(20) UNIQUE;
 
 SELECT * FROM students WHERE class_id = 1;
+SELECT * FROM classes WHERE name LIKE "CMPN S.E. A";

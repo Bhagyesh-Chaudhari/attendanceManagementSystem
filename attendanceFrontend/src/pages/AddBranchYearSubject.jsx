@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AddBranchYearSubject.css";
 
@@ -9,17 +9,20 @@ const AddBranchYearSubject = () => {
   const [subjects, setSubjects] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [message, setMessage] = useState("");
   const token = localStorage.getItem("token");
 
-  // Fetch branches, years and subjects when the component mounts
+  const dropdownRef = useRef();
+
+  // Fetch data
   useEffect(() => {
-    const fetchBranchesYearsSubjects = async () => {
+    const fetchData = async () => {
       try {
         const branchYearRes = await fetch(
           "http://localhost:5000/admin/getBranchesAndYears",
           {
-            method: "GET",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
@@ -32,21 +35,24 @@ const AddBranchYearSubject = () => {
           setBranches(branchYearData.branches);
           setYears(branchYearData.years);
         } else {
-          setMessage(branchYearData.message || "Error fetching branches and years.");
+          setMessage(
+            branchYearData.message || "Error fetching branches and years."
+          );
         }
 
-        const subjectRes = await fetch("http://localhost:5000/admin/getAllSubjects", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const subjectRes = await fetch(
+          "http://localhost:5000/admin/getAllSubjects",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const subjectData = await subjectRes.json();
         if (subjectRes.ok) {
           setSubjects(subjectData);
-          console.log(subjectData);
         } else {
           setMessage(subjectData.message || "Error fetching subjects.");
         }
@@ -56,12 +62,61 @@ const AddBranchYearSubject = () => {
       }
     };
 
-    fetchBranchesYearsSubjects();
+    fetchData();
   }, []);
+
+  const handleSubjectClick = (subject) => {
+    if (!selectedSubjects.includes(subject.id)) {
+      setSelectedSubjects([...selectedSubjects, subject.id]);
+      setSearchTerm(""); // Clear input after selection
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/admin/addBranchYearSubject",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            branchId: selectedBranch,
+            yearId: selectedYear,
+            subjectIds: selectedSubjects,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage("Subjects assigned successfully!");
+        setSelectedSubjects([]); // Clear selection
+        setSearchTerm("");
+      } else {
+        setMessage(data.message || "Failed to assign subjects.");
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage("Server error.");
+    }
+  };
+
+  const filteredSubjects = subjects.filter(
+    (subject) =>
+      subject.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !selectedSubjects.includes(subject.id)
+  );
+
+  const selectedSubjectNames = selectedSubjects
+    .map((id) => subjects.find((s) => s.id === id)?.name)
+    .filter(Boolean);
 
   return (
     <div className="assign-container">
-      <h2>Select Branch, Year and View Subjects</h2>
+      <h2>Select Branch, Year and Assign Subjects</h2>
 
       <div className="assign-form">
         <label>
@@ -94,27 +149,57 @@ const AddBranchYearSubject = () => {
           </select>
         </label>
 
-        <div className="subjects-list">
-          <h3>Available Subjects:</h3>
-          {subjects.length === 0 ? (
-            <p>No subjects found.</p>
-          ) : (
-            <ul>
-              {subjects.map((subject) => (
-                <li key={subject.id}>{subject.name}</li>
-              ))}
-            </ul>
-          )}
-        </div>
+        {selectedBranch && selectedYear && (
+          <div className="subject-dropdown-wrapper">
+            <label>
+              Assign Subjects:
+              <input
+                type="text"
+                placeholder="Type to search subjects..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="subject-search-input"
+              />
+            </label>
 
-        <div className="assign-buttons">
-          <button
-            className="back-btn"
-            onClick={() => navigate("/admin-dashboard")}
-          >
-            Back
-          </button>
-        </div>
+            {filteredSubjects.length > 0 && searchTerm && (
+              <div className="dropdown" ref={dropdownRef}>
+                {filteredSubjects.map((subject) => (
+                  <div
+                    key={subject.id}
+                    className="dropdown-item"
+                    onClick={() => handleSubjectClick(subject)}
+                  >
+                    {subject.name}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {selectedSubjectNames.length > 0 && (
+              <div className="selected-subjects">
+                <strong>Selected:</strong> {selectedSubjectNames.join(", ")}
+              </div>
+            )}
+
+            {selectedSubjects.length > 0 && (
+              <button className="assign-buttons" onClick={handleSubmit}>
+                Assign Subjects
+              </button>
+            )}
+
+            <div className="back-button-container">
+              <button
+                className="back-btn"
+                onClick={() => navigate("/admin-dashboard")}
+              >
+                Back
+              </button>
+            </div>
+          </div>
+        )}
+
+        {message && <p className="status-message">{message}</p>}
       </div>
     </div>
   );

@@ -29,6 +29,7 @@ app.use(express.json());
 
 //Common route to check if the user is authenticated
 app.post('/login', controller.login);
+app.post('/update-password', controller.updatePassword);
 
 
 // Define teacher routes directly here
@@ -40,14 +41,15 @@ app.post('/teacher/updatePassword', auth, controller.updatePassword);
 
 // Define admin routes directly here
 app.post('/admin/createTeacher', auth, controller.createTeacher);
+app.get('/admin/getAllTeachers', auth, controller.getAllTeachers);
 app.post('/admin/addClass', auth, controller.addClass);
-app.get('/admin/getAllClasses', auth, controller.getAllClasses);
+app.post('/admin/getFilteredClasses', auth, controller.getFilteredClasses);
 app.get('/admin/getBranchesAndYears', auth, controller.getBranchesAndYears);
 app.post('/admin/addSubject', auth, controller.addSubject);
 app.get('/admin/getAllSubjects', auth, controller.getAllSubjects);
 app.post('/admin/addBranchYearSubject', auth, controller.addBranchYearSubject);
-
-
+app.post('/admin/getSubjectsByBranchYear', auth, controller.getSubjectsByBranchYear);
+app.post('/admin/assignSubjectToTeacher', auth, controller.assignSubjectToTeacher);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./SubjectPanel.css";
+import "./TeacherDashBoard.css";
 
-function SubjectPanel() {
+function TeacherDashBoard() {
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -74,4 +74,4 @@ function SubjectPanel() {
   );
 }
 
-export default SubjectPanel;
+export default TeacherDashBoard;

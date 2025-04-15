@@ -38,9 +38,9 @@ exports.login = (req, res) => {
       if (!match)
         return res.status(401).json({ message: "Invalid credentials" });
 
-      // Check if teacher is logging in with temporary password (only for teachers)
-      if (teacher.temp_password && teacher.role === "teacher") {
-        return res.json({
+      // ✅ Check if using temporary password
+      if (teacher.is_temp_password && teacher.role === "teacher") {
+        return res.status(200).json({
           message: "Please change your temporary password.",
           firstLogin: true,
           teacherId: teacher.id,
@@ -48,10 +48,9 @@ exports.login = (req, res) => {
         });
       }
 
-      // Generate JWT token
       const token = jwt.sign({ id: teacher.id }, process.env.JWT_SECRET);
 
-      res.json({
+      res.status(200).json({
         message: "Login successful",
         token,
         teacher: {
@@ -64,6 +63,7 @@ exports.login = (req, res) => {
     }
   );
 };
+
 
 //Teacher Controller functions
 
@@ -202,9 +202,9 @@ exports.updatePassword = async (req, res) => {
     // Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Update the teacher's password and remove the temporary password
+    // Update the password and set is_temp_password to 0 (false)
     db.query(
-      "UPDATE teachers SET password = ? WHERE id = ?",
+      "UPDATE teachers SET password = ?, is_temp_password = 0 WHERE id = ?",
       [hashedPassword, teacherId],
       (err) => {
         if (err) return res.status(500).json({ error: err });
@@ -216,6 +216,19 @@ exports.updatePassword = async (req, res) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 };
+
+
+/*
+This function is used to fetch all teachers from the database
+*/
+
+exports.getAllTeachers = (req, res) => {
+  db.query("SELECT * FROM teachers WHERE role != 'admin'", (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results);
+  });
+};
+
 
 // Class Controller functions
 
@@ -275,16 +288,39 @@ If there is an error while fetching the classes, it returns a 500 status code wi
 If the classes are fetched successfully, it returns a 200 status code with the classes in JSON format  
 */
 
-exports.getAllClasses = (req, res) => {
-  db.query("SELECT * FROM classes", (err, results) => {
-    if (err)
+exports.getFilteredClasses = (req, res) => {
+  const { branch_name, year_name } = req.body;
+
+  if (!branch_name || !year_name) {
+    return res.status(400).json({ message: "Branch and year are required." });
+  }
+
+  const pattern = `${branch_name} ${year_name}%`; // Match with all divisions like "CMPN S.E. A", "CMPN S.E. B", etc.
+
+  const sql = "SELECT id, name FROM classes WHERE name LIKE ?"; // Fetch class ID and name
+  db.query(sql, [pattern], (err, results) => {
+    if (err) {
       return res
         .status(500)
         .json({ message: "Error fetching classes", error: err });
+    }
 
-    res.json(results);
+    // Map the results to return in the desired format: { id, name }
+    const divisions = results.map((result) => {
+      const className = result.name;
+      // Assuming the division is the last part of the class name, e.g., "CMPN S.E. A" -> "A"
+      const division = className.split(" ").pop(); // Extract the division (e.g., "A", "B", "C")
+
+      return {
+        id: result.id, // class_id
+        name: division, // Division name
+      };
+    });
+    
+    res.json({ divisions }); // Send the divisions with class_id
   });
 };
+
 
 /*
 This function is to fetch the branches and years from the database
@@ -372,47 +408,127 @@ exports.getAllSubjects = (req, res) => {
 //check if subject already assigned to the branch and year
 
 exports.addBranchYearSubject = (req, res) => {
-  const { subjectName, branchId, yearId } = req.body;
+  const { subjectIds, branchId, yearId } = req.body;
 
-  if (!subjectName || !branchId || !yearId) {
-    return res.status(400).json({ message: "All fields are required" });
+  if (!subjectIds || !Array.isArray(subjectIds) || !branchId || !yearId) {
+    return res.status(400).json({
+      message: "All fields are required and subjectIds should be an array",
+    });
   }
 
-  //check if the subject already exists in the branch_year_subjects database in that all id are stored of branch year and subject
+  const insertPromises = subjectIds.map((subjectId) => {
+    return new Promise((resolve, reject) => {
+      // Check if this combination already exists
+      db.query(
+        "SELECT * FROM branch_year_subjects WHERE branch_id = ? AND year_id = ? AND subject_id = ?",
+        [branchId, yearId, subjectId],
+        (err, results) => {
+          if (err) return reject(err);
+
+          if (results.length > 0) {
+            // Already exists, skip
+            return resolve({ subjectId, status: "already_exists" });
+          }
+
+          // Insert with order: branch_id, year_id, subject_id
+          db.query(
+            "INSERT INTO branch_year_subjects (branch_id, year_id, subject_id) VALUES (?, ?, ?)",
+            [branchId, yearId, subjectId],
+            (insertErr, result) => {
+              if (insertErr) return reject(insertErr);
+              resolve({ subjectId, status: "inserted" });
+            }
+          );
+        }
+      );
+    });
+  });
+
+  Promise.all(insertPromises)
+    .then((results) => {
+      res.status(201).json({
+        message: "Subjects processed successfully",
+        details: results,
+      });
+    })
+    .catch((error) => {
+      res.status(500).json({ message: "Error processing subjects", error });
+    });
+};
+
+
+// This function is to fetch subjects based on branch and year
+// It takes branchId and yearId from the request query parameters
+// It checks if both branchId and yearId are provided, and if not, returns a 400 status code with a message indicating that both are required 
+
+
+exports.getSubjectsByBranchYear = (req, res) => {
+  const { branch_id, year_id } = req.body;  // Get branch_id and year_id from query params
+
+  // Check if both branch_id and year_id are provided
+  if (!branch_id || !year_id) {
+    return res.status(400).json({ message: "Branch and Year are required" });
+  }
+
+  // Based on the branch_id and year_id, fetch the subjects and their names from the subjects table and in res u will send the branch_year_subjects_id and subject_id and subject_name
   db.query(
-    "SELECT * FROM branch_year_subjects WHERE branch_id = ? AND year_id = ? AND subject_id = (SELECT id FROM subjects WHERE name = ?)",
-    [branchId, yearId, subjectName],
+    `SELECT b.id AS branch_year_subjects_id, s.id AS subject_id, s.name AS subject_name 
+     FROM branch_year_subjects b
+     JOIN subjects s ON b.subject_id = s.id
+     WHERE b.branch_id = ? AND b.year_id = ?`,
+    [branch_id, year_id],
+    (err, results) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json(results); // Send the results as JSON response
+    }
+  );
+};
+
+
+
+// assign subject to teacher i will get the teacher id and subject id and class id from the request body and i will insert it into the teacher_subject table
+// check if the teacher already assigned to the subject and class
+// if already assigned then return the message that teacher already assigned to the subject and class
+// if not assigned then insert the record into the teacher_subject table and return the success message
+
+exports.assignSubjectToTeacher = (req, res) => {
+  const { teacher_id, branch_year_subject_id, class_id } = req.body;
+
+  if (!teacher_id || !branch_year_subject_id || !class_id) {
+    return res.status(400).json({
+      message: "Teacher ID, Subject ID, and Class ID are required",
+    });
+  }
+
+  // Check if teacher is already assigned to the subject and class
+  db.query(
+    "SELECT * FROM teacher_subject WHERE teacher_id = ? AND branch_year_subject_id = ? AND class_id = ?",
+    [teacher_id, branch_year_subject_id, class_id],
     (err, results) => {
       if (err) return res.status(500).json({ error: err });
 
       if (results.length > 0) {
-        return res
-          .status(409)
-          .json({
-            message: "Subject already assigned to this branch and year",
-          });
+        return res.status(400).json({
+          message: "Teacher is already assigned to this subject and class.",
+        });
       }
 
-      // If not exists, insert the subject
+      // If not assigned, insert the record into teacher_subject table
       db.query(
-        "INSERT INTO branch_year_subjects (subject_id, branch_id, year_id) VALUES (?, ?, (SELECT id FROM subjects WHERE name = ?))",
-        [branchId, yearId, subjectName],
+        "INSERT INTO teacher_subject (teacher_id, branch_year_subject_id, class_id) VALUES (?, ?, ?)",
+        [teacher_id, branch_year_subject_id, class_id],
         (insertErr, insertResult) => {
           if (insertErr) {
-            return res
-              .status(500)
-              .json({
-                message: "Error adding subject to branch and year",
-                error: insertErr,
-              });
+            return res.status(500).json({ error: insertErr });
           }
 
-          return res.status(201).json({
-            message: "Subject assigned to branch and year successfully",
-            subjectId: insertResult.insertId,
+          res.status(201).json({
+            message: "Teacher assigned to subject and class successfully",
           });
         }
       );
     }
   );
 };
+
+

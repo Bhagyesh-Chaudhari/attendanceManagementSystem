@@ -18,19 +18,33 @@ const LoginPage = () => {
       });
 
       const data = await response.json();
+      console.log(data);
 
       if (response.ok) {
-        const { role, id } = data.teacher;
-
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", role);
-
+        // Check if first login
         if (data.firstLogin) {
-          navigate(`/change-password/${id}`);
-        } else if (role === "admin") {
-          navigate("/admin-dashboard");
+          // If first login, redirect to change password page
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("role", data.role);
+          localStorage.setItem("id", data.teacherId);
+
+          navigate("/change-password", {
+            state: { teacherId: data.teacherId },
+          });
         } else {
-          navigate("/teacher-dashboard");
+          // Otherwise, handle normal login and redirect accordingly
+          const { role, teacherId } = data.teacher;
+
+          // Store role and ID in localStorage
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("role", role);
+          localStorage.setItem("id", teacherId);
+
+          if (role === "admin") {
+            navigate("/admin-dashboard");
+          } else if (role === "teacher") {
+            navigate("/teacher-dashboard");
+          }
         }
       } else {
         alert(data.message || "Login failed!");
