@@ -162,7 +162,7 @@ INSERT INTO students (roll_no, name, class_id) VALUES
 
 
 
-
+// app.post('/update-password', controller.updatePassword);
 // Define admin routes directly here
 // app.post('/admin/createTeacher', auth, controller.createTeacher);
 // app.get('/admin/getAllTeachers', auth, controller.getAllTeachers);

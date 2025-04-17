@@ -601,7 +601,7 @@ exports.getAttendance = async (req, res) => {
 
 
 
-
+// app.post('/update-password', controller.updatePassword);
 // Define admin routes directly here
 // app.post('/admin/createTeacher', auth, controller.createTeacher);
 // app.get('/admin/getAllTeachers', auth, controller.getAllTeachers);
