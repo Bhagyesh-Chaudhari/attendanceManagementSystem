@@ -58,8 +58,7 @@ CREATE TABLE students (
 CREATE TABLE subjects (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100),
-  class_id INT,
-  FOREIGN KEY (class_id) REFERENCES classes(id)
+  subject_code VARCHAR(10)
 );
 
 CREATE TABLE teacher_subject (
@@ -73,7 +72,7 @@ CREATE TABLE teacher_subject (
   FOREIGN KEY (class_id) REFERENCES classes(id)
 );
 
--- DROP TABLE IF EXISTS students;
+-- DROP TABLE IF EXISTS attendance;
 -- DROP TABLE IF EXISTS teacher_subject;
 -- ALTER TABLE teacher_subject
 -- DROP FOREIGN KEY teacher_subject_ibfk_2;
@@ -91,10 +90,13 @@ CREATE TABLE attendance (
   student_name VARCHAR(100),
   status ENUM('present', 'absent'),
   date DATE,
+  time_slot VARCHAR(50) NOT NULL,
   FOREIGN KEY (teacher_id) REFERENCES teachers(id),
   FOREIGN KEY (class_id) REFERENCES classes(id),
-  FOREIGN KEY (subject_id) REFERENCES subjects(id)
+  FOREIGN KEY (subject_id) REFERENCES subjects(id),
+  UNIQUE (teacher_id, class_id, subject_id, date, time_slot, student_name)
 );
+
 
 INSERT INTO teachers (name, email, password, role) 
 VALUES ('Admin', 'admin@school.com', '$2b$10$Go6zVsn2zzL.feu91XUY3uCo.q.EnkcBTxRDIDgwUwfpi733YMl9.', 'admin');
@@ -109,7 +111,7 @@ ALTER TABLE teachers DROP COLUMN password;
 ALTER TABLE teachers ADD COLUMN password VARCHAR(255);
 
 
-TRUNCATE TABLE classes;
+TRUNCATE TABLE attendance;
 DROP DATABASE attendance_system;
 SHOW CREATE TABLE subjects;
 ALTER TABLE subjects DROP FOREIGN KEY subjects_ibfk_1; -- only if foreign key exists

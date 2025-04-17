@@ -64,7 +64,6 @@ exports.login = (req, res) => {
   );
 };
 
-
 //Teacher Controller functions
 
 /*
@@ -90,11 +89,11 @@ exports.getSubjects = (req, res) => {
   `;
 
   db.query(query, [teacherId], (err, results) => {
-    if (err) return res.status(500).json({ error: "Database error", details: err });
+    if (err)
+      return res.status(500).json({ error: "Database error", details: err });
     res.json(results);
   });
 };
-
 
 /*
 This function is used to submit attendance for a specific class and subject
@@ -106,7 +105,13 @@ It returns a success message if the attendance is submitted successfully
 
 exports.submitAttendance = (req, res) => {
   const teacherId = req.user.id;
-  const { class_id, subjectId, attendanceList, date } = req.body;
+  const { class_id, subjectId, attendanceList, date, time_slot } = req.body;
+
+  if (!time_slot || !date) {
+    return res
+      .status(400)
+      .json({ message: "Date and time slot are required." });
+  }
 
   const values = attendanceList.map((entry) => [
     teacherId,
@@ -115,16 +120,29 @@ exports.submitAttendance = (req, res) => {
     entry.student_name,
     entry.status,
     date,
+    time_slot,
   ]);
 
-  db.query(
-    "INSERT INTO attendance (teacher_id, class_id, subject_id, student_name, status, date) VALUES ?",
-    [values],
-    (err) => {
-      if (err) return res.status(500).json({ error: err });
-      res.json({ message: "Attendance submitted" });
+  const query = `
+    INSERT INTO attendance (
+      teacher_id, class_id, subject_id, student_name, status, date, time_slot
+    ) VALUES ?
+  `;
+
+  db.query(query, [values], (err) => {
+    if (err) {
+      if (err.code === "ER_DUP_ENTRY") {
+        return res.status(409).json({
+          message:
+            "Attendance for this lecture time slot has already been submitted.",
+        });
+      }
+
+      return res.status(500).json({ error: err });
     }
-  );
+
+    res.json({ message: "Attendance submitted successfully." });
+  });
 };
 
 /*
@@ -224,7 +242,6 @@ exports.updatePassword = async (req, res) => {
   }
 };
 
-
 /*
 This function is used to fetch all teachers from the database
 */
@@ -235,7 +252,6 @@ exports.getAllTeachers = (req, res) => {
     res.json(results);
   });
 };
-
 
 // Class Controller functions
 
@@ -323,11 +339,10 @@ exports.getFilteredClasses = (req, res) => {
         name: division, // Division name
       };
     });
-    
+
     res.json({ divisions }); // Send the divisions with class_id
   });
 };
-
 
 /*
 This function is to fetch the branches and years from the database
@@ -463,14 +478,12 @@ exports.addBranchYearSubject = (req, res) => {
     });
 };
 
-
 // This function is to fetch subjects based on branch and year
 // It takes branchId and yearId from the request query parameters
-// It checks if both branchId and yearId are provided, and if not, returns a 400 status code with a message indicating that both are required 
-
+// It checks if both branchId and yearId are provided, and if not, returns a 400 status code with a message indicating that both are required
 
 exports.getSubjectsByBranchYear = (req, res) => {
-  const { branch_id, year_id } = req.body;  // Get branch_id and year_id from query params
+  const { branch_id, year_id } = req.body; // Get branch_id and year_id from query params
 
   // Check if both branch_id and year_id are provided
   if (!branch_id || !year_id) {
@@ -490,8 +503,6 @@ exports.getSubjectsByBranchYear = (req, res) => {
     }
   );
 };
-
-
 
 // assign subject to teacher i will get the teacher id and subject id and class id from the request body and i will insert it into the teacher_subject table
 // check if the teacher already assigned to the subject and class
@@ -538,4 +549,67 @@ exports.assignSubjectToTeacher = (req, res) => {
   );
 };
 
+exports.getAttendance = async (req, res) => {
+  const { classId, subjectId } = req.body;
 
+  // Validate the parameters
+  if (!classId || !subjectId) {
+    return res.status(400).json({
+      message: "Class ID and Subject ID are required",
+    });
+  }
+
+  // Query to get the attendance records
+  const query = `
+    SELECT student_name, status, date, time_slot
+    FROM attendance
+    WHERE class_id = ? AND subject_id = ?
+    ORDER BY date DESC, time_slot;
+  `;
+
+  try {
+    // Using a promise to handle async database query
+    const [results] = await db.promise().query(query, [classId, subjectId]);
+
+    if (results.length > 0) {
+      res.json({ success: true, data: results });
+    } else {
+      res.status(404).json({ success: false, message: "No attendance found." });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error." });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Define admin routes directly here
+// app.post('/admin/createTeacher', auth, controller.createTeacher);
+// app.get('/admin/getAllTeachers', auth, controller.getAllTeachers);
+// app.post('/admin/addClass', auth, controller.addClass);
+// app.post('/admin/getFilteredClasses', auth, controller.getFilteredClasses);
+// app.get('/admin/getBranchesAndYears', auth, controller.getBranchesAndYears);
+// app.post('/admin/addSubject', auth, controller.addSubject);
+// app.get('/admin/getAllSubjects', auth, controller.getAllSubjects);
+// app.post('/admin/addBranchYearSubject', auth, controller.addBranchYearSubject);
+// app.post('/admin/getSubjectsByBranchYear', auth, controller.getSubjectsByBranchYear);
+// app.post('/admin/assignSubjectToTeacher', auth, controller.assignSubjectToTeacher);

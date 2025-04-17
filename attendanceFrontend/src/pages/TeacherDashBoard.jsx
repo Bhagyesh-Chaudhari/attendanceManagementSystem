@@ -37,40 +37,54 @@ function TeacherDashBoard() {
     fetchSubjects();
   }, []);
 
-  return (
-    <div className="subject-container">
-      <div className="subject-header">
-        <h2>Your Classes & Subjects</h2>
-        <p>Select a class and subject to take attendance</p>
-      </div>
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
 
-      {loading ? (
-        <div className="loading">Loading subjects...</div>
-      ) : error ? (
-        <div className="error-message">{error}</div>
-      ) : (
-        <div className="subject-grid">
-          {subjects.length === 0 ? (
-            <div className="no-subjects">
-              <p>No classes or subjects assigned to you.</p>
-            </div>
-          ) : (
-            subjects.map((subj) => (
-              <div
-                key={subj.subject_id}
-                className="subject-card"
-                onClick={() =>
-                  navigate("/attendanceForm", { state: { selected: subj } })
-                }
-              >
-                <h3>{subj.class_name}</h3>
-                <p>{subj.subject_name}</p>
-              </div>
-            ))
-          )}
+  return (
+    <>
+      <nav className="navbar">
+        <div className="logo">🏫 VIT</div>
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
+      </nav>
+
+      <div className="subject-container">
+        <div className="subject-header">
+          <h2>Your Classes & Subjects</h2>
+          <p>Select a class and subject to take attendance</p>
         </div>
-      )}
-    </div>
+
+        {loading ? (
+          <div className="loading">Loading subjects...</div>
+        ) : error ? (
+          <div className="error-message">{error}</div>
+        ) : (
+          <div className="subject-grid">
+            {subjects.length === 0 ? (
+              <div className="no-subjects">
+                <p>No classes or subjects assigned to you.</p>
+              </div>
+            ) : (
+              subjects.map((subj) => (
+                <div
+                  key={subj.subject_id}
+                  className="subject-card"
+                  onClick={() =>
+                    navigate("/attendanceForm", { state: { selected: subj } })
+                  }
+                >
+                  <h3>{subj.class_name}</h3>
+                  <p>{subj.subject_name}</p>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 

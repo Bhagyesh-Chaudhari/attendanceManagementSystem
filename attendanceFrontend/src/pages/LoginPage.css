@@ -1,23 +1,27 @@
-/* LoginPage.css */
-
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #e0eafc, #cfdef3);
+  background: linear-gradient(340deg, #0f2027, #203a43, #2c5364); /* Deep Ocean Blue */
   height: 100vh;
+  overflow: hidden;
+}
+.login-wrapper {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* full height of the viewport */
+  padding: 20px; /* optional: for some space on smaller screens */
 }
 
 .login-container {
   width: 100%;
-  max-width: 400px;
-  padding: 2rem;
-  background-color: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.6s ease-in-out;
+  max-width: 420px;
+  padding: 2.5rem;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border-radius: 25px;
+  box-shadow: -12px -12px 30px rgba(0, 0, 0, 0.3), 8px 8px 15px rgba(255, 255, 255, 0.5);
+  animation: fadeIn 0.8s ease-in-out;
+  transform-style: preserve-3d;
 }
 
 .login-form {
@@ -26,50 +30,58 @@ body {
 }
 
 .login-form h2 {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   text-align: center;
-  color: #333;
+  color: #001f3f;
+  font-size: 2rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .login-form input {
   padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 12px;
+  margin-bottom: 1.2rem;
+  border: none;
+  border-radius: 15px;
   font-size: 1rem;
-  transition: border-color 0.2s;
+  background: #f5f5f5;
+  box-shadow: inset 4px 4px 8px #d1d1d1, inset -4px -4px 8px #ffffff;
+  transition: box-shadow 0.3s ease;
 }
 
 .login-form input:focus {
-  border-color: #0077ff;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.1);
+  box-shadow: inset 2px 2px 4px #aaa, inset -2px -2px 4px #fff, 0 0 5px #0077ff;
+  background: #fff;
 }
 
 .login-form button {
   padding: 0.75rem;
-  background-color: #0077ff;
+  background: linear-gradient(145deg, #001f3f, #003366);
   color: white;
-  font-weight: 600;
+  font-weight: bold;
   font-size: 1rem;
   border: none;
-  border-radius: 12px;
+  border-radius: 15px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.3), -2px -2px 10px rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
 }
 
 .login-form button:hover {
-  background-color: #005ecc;
+  background: #00264d;
+  box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
 }
 
 .signup-link {
   margin-top: 1rem;
   text-align: center;
   font-size: 0.9rem;
+  color: #333;
 }
 
 .signup-link a {
-  color: #0077ff;
+  color: #005ecc;
   text-decoration: none;
   font-weight: 500;
 }
@@ -81,9 +93,8 @@ body {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);

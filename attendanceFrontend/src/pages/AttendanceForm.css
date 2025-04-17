@@ -1,0 +1,210 @@
+.attendance-page {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding-bottom: 40px;
+  }
+  
+  .top-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1e293b;
+    padding: 16px 32px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #60a5fa;
+  }
+  
+  .heading {
+    text-align: center;
+    color: #ffffff;
+    font-size: larger;
+    font-weight: bold;
+  }
+  
+  .back-button {
+    background-color: #ff4d4d;
+    border: none;
+    padding: 8px 14px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  /**************************************************************/
+
+  .form-controls {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 20px 0;
+    font-size: 16px;
+  }
+  
+  .form-controls label {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    color: #ffffff;
+  }
+  
+  .form-controls input[type="date"],
+  .form-controls select {
+    padding: 8px;
+    font-size: 15px;
+    margin-top: 4px;
+    border-radius: 4px;
+    border: 1px solid #aaa;
+  }
+
+  /**************************************************************/
+  
+  .status-msg {
+    text-align: center;
+    color: #555;
+    margin-top: 40px;
+  }
+  
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0;
+  }
+  
+  .controls button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .controls button:hover {
+    background-color: #0056b3;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+    margin: auto;
+    width: 90%;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .attendance-table {
+    width: 100%;
+    border-collapse: separate;
+    font-family: "Segoe UI", sans-serif;
+    color: #333;
+  }
+  
+  .attendance-table th,
+  .attendance-table td {
+    padding: 14px 20px;
+    text-align: center;
+    background-color: #ffffffdd;
+    backdrop-filter: blur(4px);
+    border: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .attendance-table th {
+    background-color: #4f6d7a;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    font-weight: 600;
+  }
+  
+  .attendance-table tr:nth-child(even) td {
+    background-color: #eef2f5;
+  }
+  
+  .submit-container {
+    text-align: center;
+    margin-top: 30px;
+  }
+  
+  .submit-container button {
+    background-color: #28a745;
+    color: white;
+    padding: 14px 26px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-container button:hover {
+    background-color: #218838;
+  }
+  
+  .date-time-slot {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  
+  .date-time-slot .field {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .date-time-slot label {
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-size: 15px;
+    color: #1e293b;
+  }
+  
+  .date-time-slot input,
+  .date-time-slot select {
+    padding: 10px 14px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 200px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .date-time-slot input:focus,
+  .date-time-slot select:focus {
+    border-color: #007bff;
+  }
+  
+  .attendance-page-link {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .attendance-page-link button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .attendance-page-link button:hover {
+    background-color: #2980b9;
+  }
+  

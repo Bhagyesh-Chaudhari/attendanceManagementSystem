@@ -10,6 +10,7 @@ import AddSubjects from './pages/AddSubjects';
 import AddBranchYearSubject from './pages/AddBranchYearSubject';
 import AddTeacher from './pages/AddTeacher';
 import AssignTeacher from './pages/AssignTeacher';
+import AttendancePage from './pages/AttendancePage';
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/add-subject-branch" element={<AddBranchYearSubject />} /> 
         <Route path="/create-teacher" element={<AddTeacher />} /> 
         <Route path="/assign-teacher" element={<AssignTeacher />} />
+        <Route path="/attendance-page" element={<AttendancePage />} />
       </Routes>
     </Router>
   );
