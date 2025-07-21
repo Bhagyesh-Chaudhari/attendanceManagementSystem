@@ -1,21 +1,3 @@
-/**********************************************************************************************************************************
-File Name: server.js
-
-File created by: Bhagyesh Chaudhari
-
-Date: 11-04-2025
-
-Description: This file sets up the Express server and defines the routes for handling teacher-related operations. It uses middleware for authentication and connects to the database.
-
-last modified: 12-04-2025
-
-last modified by: Bhagyesh Chaudhari
-
-Description of changes: Added routes for teacher login, fetching subjects, submitting attendance, and creating a teacher account. Integrated JWT authentication middleware to protect routes.
-
-***********************************************************************************************************************************/
-
-
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
